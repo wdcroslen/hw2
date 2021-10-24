@@ -52,11 +52,13 @@ class _LoginPageState extends State<LoginPage> {
         "Accept": "application/json",
         "Access-Control-Allow-Origin": "*"
       });
-      print(response);
+      print('after help');
 
       var body = jsonDecode(response.body);
 
-      if (body['response'] == 'true') {
+      print(body);
+
+      if (body['response'] == true) {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => SecondPage()),);

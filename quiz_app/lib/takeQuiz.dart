@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizapp/createQuiz.dart';
 import 'package:http/http.dart' as http;
+import 'package:quizapp/gradingPage.dart';
 
 import 'Question.dart';
 
@@ -39,17 +40,35 @@ class DuringQuizPage extends StatefulWidget {
 class _DuringQuizPageState extends State<DuringQuizPage> {
   final GlobalKey<FormFieldState<String>> _userAnswer = GlobalKey();
   int _value = 0;
+  String radioSelected="";
   get _values =>
       ({
         'userAns': _userAnswer.currentState?.value,
       });
+
+  Widget _confirmSubmit(BuildContext context) {
+    return new AlertDialog(
+      title: const Text('Are you sure you would like to submit?'),
+      actions: <Widget>[
+        new ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => GradingPage()),);
+          },
+          child: Center(child: const Text('Confirm')),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(child: Column(
+      body: SingleChildScrollView( child: Center(child: Column(
           children: [
             //SvgPicture.asset("assets/icons/bg.svg", fit: BoxFit.fill),
             SafeArea(
@@ -107,24 +126,24 @@ class _DuringQuizPageState extends State<DuringQuizPage> {
                                               child: Row(crossAxisAlignment: CrossAxisAlignment.center,
                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
-                                                    Text("${index+1}.",style: TextStyle(color: Colors.black,fontSize: 14,fontWeight: FontWeight.bold),),
+                                            Radio(  value: index,
+                                              groupValue: _value,
+                                              activeColor: Colors.black,
+                                              onChanged: (value){
+                                                setState((){
+                                                  _value = index;
+                                                  answers[i] = (index+1).toString();
+                                                  // radioSelected = value.toString();
+                                                  print(answers);
+                                                });
+                                              },),
 
-
-                                                    Container(width: 200,
-                                                        height: 20, child:
-                                                        ListTile(
-                                                          title: Text("${questions[i].getOptions()[index]}",style: TextStyle(color: Colors.black,fontSize: 14,fontWeight: FontWeight.bold),),
-                                                          leading: Radio(
-                                                            value: index,
-                                                            groupValue: answers[i],
-                                                            activeColor: Colors.black,
-                                                            onChanged: (index){
-                                                              setState((){
-                                                                //answers[i] = index.toString();
-                                                                answers[i] = index.toString();
-                                                                print(answers);
-                                                              });
-                                                            },),),)])
+                                            Container(width:190, height: 71, child: Text("${questions[i].getOptions()[index]}",style: TextStyle(color: Colors.black,fontSize: 12,fontWeight: FontWeight.bold),),
+                                            ) ,
+                                                    Divider(
+                                                      height: 2,
+                                                      color: Colors.red,
+                                                    )]),
                                                        // Text("${questions[i].getOptions()[index]}",style: TextStyle(color: Colors.black,fontSize: 14,fontWeight: FontWeight.bold),)),])
                                           )),
                                     ],
@@ -154,6 +173,9 @@ class _DuringQuizPageState extends State<DuringQuizPage> {
                               i += 1;
                             } else{
                               print(answers);
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>  _confirmSubmit(context),);
                             }
                           });
                         }
@@ -174,7 +196,7 @@ class _DuringQuizPageState extends State<DuringQuizPage> {
                           title: Text('Submit Quiz'),
                           backgroundColor: Colors.yellow,
                         ),
-                        if (i != last)BottomNavigationBarItem(
+                        if (i != last) BottomNavigationBarItem(
                           icon: const Icon(Icons.arrow_forward),
                           title: Text('next'),
                           backgroundColor: Colors.yellow,
@@ -185,6 +207,8 @@ class _DuringQuizPageState extends State<DuringQuizPage> {
             ]),
           )],
       ),
-    ));
+    )
+      )
+    );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:quizapp/createQuiz.dart';
 import 'package:http/http.dart' as http;
 import 'package:quizapp/takeQuiz.dart';
+import 'package:quizapp/reviewPage.dart';
 
 var questionsWrongIndexes = [];
 
@@ -90,7 +91,11 @@ class _GradePageState extends State<GradePage> {
                   primary: Colors.blue,
                 ),
                 child: Text('Review Quiz'),
-                onPressed: () {}
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Review()),);
+                }
                 ),
           SizedBox(height:40),
           ElevatedButton(

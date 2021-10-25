@@ -70,7 +70,6 @@ class _DuringQuizPageState extends State<DuringQuizPage> {
       ),
       body: SingleChildScrollView( child: Center(child: Column(
           children: [
-            //SvgPicture.asset("assets/icons/bg.svg", fit: BoxFit.fill),
             SafeArea(
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

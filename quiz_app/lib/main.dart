@@ -43,16 +43,28 @@ class _LoginPageState extends State<LoginPage> {
         'password': _passwordFormFieldKey.currentState?.value
       });
 
+  Widget _incorrectLogin(BuildContext context) {
+    return new AlertDialog(
+      title: const Text('Password and username do not match'),
+      actions: <Widget>[
+        new ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Center(child: const Text('Close')),
+        ),
+      ],
+    );
+  }
+
   validateUser(BuildContext ctx) async{
-    print("BEFORE HELP");
     if (_values['username'] != "" && _values['password'] != "") {
-      print("Middle HELP");
-      var url = 'http://cheon.atwebpages.com/quiz/login.php?user=wdcroslen&pin=7569';
+      var url = 'http://cheon.atwebpages.com/quiz/login.php?user=';
+      url += _values['username'] + '&pin=' + _values['password'];
       var response = await http.get(Uri.parse(url),headers: {
         "Accept": "application/json",
         "Access-Control-Allow-Origin": "*"
       });
-      print('after help');
 
       var body = jsonDecode(response.body);
 
@@ -62,6 +74,12 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => SecondPage()),);
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) =>  _incorrectLogin(context),
+        );
+
       }
     }
   }

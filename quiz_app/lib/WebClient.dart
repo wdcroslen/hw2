@@ -6,9 +6,17 @@ import 'MultipleChoiceQuestion.dart';
 /// Class that interacts with the server
 class WebClient {
   /// Returns the json response from a server
-//  this.questions = Future<List<Question>>;
+  var questions;
 
-  Future<String> getResponse(var url) async {
+  setQuestions(var q){
+    this.questions = q;
+  }
+
+  getQuestions(){
+    return this.questions;
+  }
+
+  Future getResponse(var url) async {
     var response;
     if (url == null) {
       print("Oh NO your url isn't right!!");
@@ -30,7 +38,7 @@ class WebClient {
   }
 
   /// returns a list of question objects based on the url of the quiz
-  Future generateQuiz(var response) async {
+  Future<List> generateQuiz(var response) async {
     var questionList = [];
     var quizLength = response['quiz']['question'].length;
     for (var i = 0; i < quizLength; i++) {

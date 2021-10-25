@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:quizapp/Question.dart';
+import 'package:quizapp/takeQuiz.dart';
 import 'WebClient.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+
+WebClient webClient = WebClient();
+List<dynamic> questions = [];
 
 class SecondPage extends StatelessWidget {
   const SecondPage({Key? key}) : super(key: key);
@@ -12,7 +16,7 @@ class SecondPage extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
+        primarySwatch: Colors.orange,
       ),
       home: QuizPage(title: 'Quizzes'),
     );
@@ -29,7 +33,6 @@ class QuizPage extends StatefulWidget {
 class _QuizPageState extends State<QuizPage> {
   final GlobalKey<FormFieldState<String>> _quizNumber = GlobalKey();
 
-
   _notEmpty(String value) => value != null && value.isNotEmpty;
 
   get _values =>
@@ -37,23 +40,24 @@ class _QuizPageState extends State<QuizPage> {
         'quiz': _quizNumber.currentState?.value,
       });
 
+  setItems() async{
+    var response = await webClient.getResponse(Uri.parse(quizURL));
+    items = [];
+    List<dynamic> list = await webClient.generateQuiz(response);
+    questions = list;
+    for (int i =0; i<list.length; i++){
+      print(list[i].getStem().toString());
+      items.add(list[i].getStem().toString());
+    }
 
-  List <String> items = ["Q1", "Q2"];
+  }
 
-  var questions = [];
+  List<dynamic> items = [];
   Future<String> response = Future.delayed(const Duration(seconds: 1), () => "No Response.");
   String quizURL = "ab";
-  WebClient webClient = WebClient();
 
-  Future<String> getData(var url) async {
-      var response;
-      if (url == null) {
-        print("Oh NO your url isn't right!!");
-      } else {
-        response = await http.get(url);
-      }
-      response = json.decode(response.body);
-      return response;
+  Future<List> getQuestions(var response) async {
+    return await webClient.generateQuiz(jsonDecode(response.body));
   }
 
   Widget _enterNumberDialog(BuildContext context) {
@@ -91,15 +95,16 @@ class _QuizPageState extends State<QuizPage> {
         title: Text(widget.title),
     ),
     body:
-        Center ( child: Column (
+        SingleChildScrollView ( child: Column (
           children: <Widget> [
             Form(
                 child:
                   Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                       SizedBox(height: 50),
                         Container(
-                          width: 400,
+                          width: 300,
                           child:
                           TextFormField(
                             key: _quizNumber,
@@ -132,7 +137,7 @@ class _QuizPageState extends State<QuizPage> {
                                   quizURL = webClient.getQuiz(
                                       int.parse(_values['quiz']),
                                       "http://cheon.atwebpages.com/quiz/");
-                                  response = getData(Uri.parse(quizURL));
+                                  setItems();
                                 });
 
                               }
@@ -148,31 +153,46 @@ class _QuizPageState extends State<QuizPage> {
                   ),
             ),
             SizedBox(height: 25),
-            Container( child: Column(children: <Widget> [
-              Text(quizURL),
+            Column(children: <Widget> [
+              if (items.length > 0) Center(child: Text("Quiz Summary",style: TextStyle(color: Colors.blue,fontSize: 24,fontWeight: FontWeight.bold),)),
+              SizedBox(height: 25),
               ListView.builder(
                 shrinkWrap: true
                 ,itemBuilder: (context,index){
                 return Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(7.0),
+                      padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                      child:
+                      Container(width: 250,
                       child: Row(crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("${items[index]}",style: TextStyle(color: Colors.red,fontSize: 14,fontWeight: FontWeight.bold),),
-                          Icon(Icons.highlight_remove),
-                        ],),
-                    ),
+                          Text("Q${index+1}",style: TextStyle(color: Colors.orange,fontSize: 14,fontWeight: FontWeight.bold),),
+                          Container(width: 200,
+                            height: 27, child:
+                          Text("${items[index]}",style: TextStyle(color: Colors.black,fontSize: 12,fontWeight: FontWeight.bold),)),])
+                      )),
                     Divider(
                       height: 2,
                       color: Colors.blueGrey,
                     )
                   ],
                 );
-              },itemCount: items.length,)
+              },itemCount: items.length,),
+              SizedBox(height:25),
+              if (items.length > 0) ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.blue,
+                ),
+                child: Text('Start Quiz!'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InQuizPage()),);
+                },
+              )
             ]
-            )
             ),
           ]
         )

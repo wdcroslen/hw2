@@ -2,6 +2,7 @@ class Question {
   String _stem = '';
   var _answer = '';
   var _userAnswer = '';
+  var _figure = '';
 
   getAnswer() {
     return this._answer;
@@ -9,6 +10,14 @@ class Question {
 
   void setAnswer(var answer) {
     this._answer = answer;
+  }
+
+  getFigure() {
+    return this._answer;
+  }
+
+  void setFigure(var figure) {
+    this._figure = figure;
   }
 
   String getStem() {

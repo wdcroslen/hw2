@@ -43,6 +43,7 @@ class WebClient {
     var quizLength = response['quiz']['question'].length;
     for (var i = 0; i < quizLength; i++) {
       var type = response['quiz']['question'][i]['type'];
+      var figure = response['quiz']['question'][i]['figure'];
       var question = (type == 1)
           ? MultipleChoiceQuestion.option(
           response['quiz']['question'][i]['option'])
@@ -50,6 +51,7 @@ class WebClient {
 
       question.setStem(response['quiz']['question'][i]['stem']);
       question.setAnswer(response['quiz']['question'][i]['answer'].toString());
+      question.setFigure(figure);
       questionList.add(question);
     }
     return questionList;
